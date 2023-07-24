@@ -159,3 +159,59 @@ describe('emptyMap', () => {
     assert.equal(mappings, 'AAAA,MAMAA,CAACC,MAAM;;AENP;AACA;AACA;;ACFA;AACA;AACA;')
   });
 });
+
+describe('CombinedFile', () => {
+  it('should support only generated code', () => {
+    let file = new SourceMap.CombinedFile();
+    file.addGeneratedCode('test\ntest2\nhello');
+    let out = file.build();
+    assert.deepStrictEqual(out, { code: 'test\ntest2\nhello', map: null });
+  });
+
+  it('should support single file with map', () => {
+    let file = new SourceMap.CombinedFile();
+    file.addGeneratedCode('test');
+    file.addGeneratedCode('\n');
+    file.addCodeWithMap('/test.js', {
+      code: 'var i = 0;\ni++\n;',
+      map: {
+        mappings: 'AAAA;AACA;ACFA;',
+        sources: ['/input.js']
+      },
+      header: '// test.js\n\n',
+      footer: '// end\n'
+    });
+
+    let out = file.build();
+    assert.deepStrictEqual(out, {
+      code: 'test\n// test.js\n\nvar i = 0;\ni++\n;// end\n',
+      map: {
+        mappings: ';;;AAAA;AACA;ACFA;',
+        sources: ['/input.js']
+      }
+    });
+  });
+
+  it('should support single file without map', () => {
+    let file = new SourceMap.CombinedFile();
+    file.addGeneratedCode('test');
+    file.addGeneratedCode('\n');
+    file.addCodeWithMap('/test.js', {
+      code: 'var i = 0;\ni++\n;',
+      header: '// test.js\n\n',
+      footer: '// end\n'
+    });
+
+    let out = file.build();
+    assert.deepStrictEqual(out, {
+      code: 'test\n// test.js\n\nvar i = 0;\ni++\n;// end\n',
+      map: {
+        names: [],
+        mappings: ';;;AAAA;AACA;AACA;',
+        sources: ['/test.js'],
+        sourcesContent: ['var i = 0;\ni++\n;'],
+        version: 3
+      }
+    });
+  });
+});

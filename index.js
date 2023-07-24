@@ -1,6 +1,6 @@
 const vlq = require('vlq');
 
-module.exports = class SourceMap {
+class SourceMap {
   constructor() {
     this.mappings = '';
     this.sources = [];
@@ -145,6 +145,8 @@ module.exports = class SourceMap {
   }
 }
 
+module.exports = SourceMap;
+
 function analyzeMappings(mappings, hasNames) {
   // If there are no names, then no need to update them
   let updatedNames = !hasNames;
@@ -268,3 +270,147 @@ function decode(string, pos, index, end) {
   return posIndex;
 }
 
+class CombinedFile {
+  constructor() {
+    this._chunks = [];
+    this._lineOffset = 0;
+    this._addedFiles = 0;
+  }
+
+  addEmptyLines(lineCount) {
+    this._chunks.push('\n'.repeat(lineCount));
+    this._lineOffset += lineCount;
+  }
+
+  addGeneratedCode(code) {
+    let lineCount = countLines(code);
+    this._chunks.push(code);
+    this._lineOffset += lineCount;
+  }
+
+  addCodeWithMap(sourceName, {
+    code,
+    map,
+    header,
+    footer
+  }) {
+    this._addedFiles += 1;
+    let lineCount = countLines(code) + 1;
+    
+    if (header) {
+      this.addGeneratedCode(header);
+    }
+
+    this._chunks.push({
+      code,
+      map,
+      sourceName,
+      lineOffset: this._lineOffset,
+      lines: lineCount
+    });
+
+    if (footer) {
+      this.addGeneratedCode(footer);
+    }
+
+    if (map) {
+      this._hasInputMaps = true;
+    }
+
+    this._lineOffset += lineCount;
+  }
+
+  _buildWithMap() {
+    let code = '';
+    let sourceMap = new SourceMap();
+
+    this._chunks.forEach(chunk => {
+      if (typeof chunk === 'string') {
+        code += chunk;
+      } else if (typeof chunk === 'object') {
+        code += chunk.code;
+
+        if (chunk.map) {
+          sourceMap.addMap(chunk.map, chunk.lineOffset)
+        } else {
+          sourceMap.addEmptyMap(chunk.sourceName, chunk.code, chunk.lineOffset, chunk.lines);
+        }
+      } else {
+        throw new Error(`unrecognized chunk type, ${typeof chunk}`);
+      }
+    });
+
+    let map = sourceMap.toVLQ();
+    map.version = 3;
+    sourceMap.delete();
+
+    return { code, map };
+  }
+
+  // Optimization for when there are 1 or 0 files.
+  // We can avoid parsing the source map if there is one, and instead
+  // modify it to account for the offset from any generated code. 
+  _buildWithBiasedMap() {
+    let file;
+    let header = '';
+    let footer = '';
+
+    this._chunks.forEach(chunk => {
+      if (typeof chunk === 'string') {
+        if (file) {
+          footer += chunk;
+        } else {
+          header += chunk;
+        }
+      } else if (typeof chunk === 'object') {
+        if (file) {
+          throw new Error('_buildWithBiasedMap does not support multiple files');
+        }
+        file = chunk;
+      } else {
+        throw new Error(`unrecognized chunk type, ${typeof chunk}`);
+      }
+    });
+
+    if (!file) {
+      return { code: header + footer, map: null };
+    }
+
+    let map = file.map;
+
+    if (!map) {
+      let sourceMap = new SourceMap();
+      sourceMap.addEmptyMap(file.sourceName, file.code, file.lineOffset, file.lines);
+      map = sourceMap.build();
+    } else {
+      // Bias the input sourcemap to account for the lines added by the header
+      // This is much faster than parsing and re-encoding the sourcemap
+      let headerMappings = ';'.repeat(file.lineOffset);
+      map = Object.assign({}, map);
+      map.mappings = headerMappings + map.mappings;
+    }
+
+    return {
+      code: header + file.code + footer,
+      map
+    };
+  }
+
+  build() {
+    let code;
+    let map;
+
+    if (this._addedFiles < 2) {
+      ({ code, map } = this._buildWithBiasedMap());
+    } else if (!this._hasInputMaps) {
+      ({ code, map } = this._buildWithMap());
+    }
+
+    return {
+      code,
+      map
+    };
+  }
+}
+
+module.exports.CombinedFile = CombinedFile;
