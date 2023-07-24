@@ -1,6 +1,6 @@
 # @zodern/source-maps
 
-Very fast library to concat source maps. Generally at least 3x faster than other source map libraries.
+Very fast library to concat source maps.
 
 ```
 npm install @zodern/source-maps
@@ -28,17 +28,20 @@ This design would lend itself to easily adding caching, or parallelism using wor
 
 #### benchmark
 
-Generating empty source maps (small is 10 line files, medium is 10,000 line files, and large is 1,000,000 line files).
-Larger is better.
+Generating empty source maps: 
+
 ```
+# Small is 3 files with 10 lines each
 @zodern/source-maps - small with lineCount x 3,527,239 ops/sec ±0.30% (92 runs sampled)
 @zodern/source-maps - small x 1,385,932 ops/sec ±0.36% (93 runs sampled)
 @parcel/source-map - small x 222,989 ops/sec ±0.39% (95 runs sampled)
 
+# Medium is 3 files with 10,000 lines each
 @zodern/source-maps - medium with lineCount x 2,071,118 ops/sec ±0.40% (94 runs sampled)
 @zodern/source-maps - medium x 2,853 ops/sec ±0.30% (101 runs sampled)
 @parcel/source-map - medium x 690 ops/sec ±0.66% (96 runs sampled)
 
+# Large is 3 files with 1,000,000 lines each
 @zodern/source-maps - large with lineCount x 1,657,165 ops/sec ±0.36% (100 runs sampled)
 @zodern/source-maps - large x 28.66 ops/sec ±0.27% (52 runs sampled)
 @parcel/source-map - large x 6.89 ops/sec ±3.88% (22 runs sampled)
