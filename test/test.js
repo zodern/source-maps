@@ -215,4 +215,28 @@ describe('CombinedFile', () => {
       }
     });
   });
+
+  it('should support multiple files, one without a map', () => {
+    let file = new SourceMap.CombinedFile();
+    file.addGeneratedCode('test');
+    file.addGeneratedCode('\n');
+    file.addCodeWithMap('/test.js', {
+      code: 'var i = 0;\ni++\n;',
+      header: '// test.js\n\n',
+      footer: '// end\n'
+    });
+    file.addCodeWithMap('/test2.js', { code: 'alert("message");' })
+
+    let out = file.build();
+    assert.deepStrictEqual(out, {
+      code: 'test\n// test.js\n\nvar i = 0;\ni++\n;// end\nalert("message");',
+      map: {
+        names: [],
+        mappings: ';;;AAAA;AACA;AACA;;ACFA;',
+        sources: ['/test.js', '/test2.js'],
+        sourcesContent: ['var i = 0;\ni++\n;', 'alert("message");'],
+        version: 3
+      }
+    });
+  });
 });

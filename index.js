@@ -341,9 +341,7 @@ class CombinedFile {
       }
     });
 
-    let map = sourceMap.toVLQ();
-    map.version = 3;
-    sourceMap.delete();
+    let map = sourceMap.build();
 
     return { code, map };
   }
