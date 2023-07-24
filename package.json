@@ -1,0 +1,19 @@
+{
+  "name": "source-maps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "benchmark": "^2.1.4",
+    "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "vlq": "^2.0.4"
+  }
+}
