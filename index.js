@@ -1,10 +1,15 @@
 const vlq = require('vlq');
 
-const newLineRegex = /\n/g;
 function countLines(code) {
-  let matches = code.match(newLineRegex);
+  let lastIndex = code.indexOf('\n');
+  let count = 0;
 
-  return matches ? matches.length : 0;
+  while(lastIndex > -1) {
+    count += 1;
+    lastIndex = code.indexOf('\n', lastIndex + 1);
+  }
+
+  return count;
 }
 
 let charIntegers = new Int8Array(300);

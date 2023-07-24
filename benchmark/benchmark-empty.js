@@ -62,7 +62,6 @@ let inputMedium = '\n'.repeat(medLineCount);
 let largeLineCount = 1000000;
 let inputLarge = '\n'.repeat(largeLineCount);
 
-
 new Benchmark.Suite()
   .add('@parcel/source-map - small', function (){
     let map = new ParcelSourceMap();

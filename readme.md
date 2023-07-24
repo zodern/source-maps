@@ -31,17 +31,17 @@ This design would lend itself to easily adding caching, or parallelism using wor
 Generating empty source maps (small is 10 line files, medium is 10,000 line files, and large is 1,000,000 line files).
 Larger is better.
 ```
-concat-source-maps - small with lineCount x 3,494,583 ops/sec ±0.36% (99 runs sampled)
-concat-source-maps - small x 1,103,697 ops/sec ±0.30% (98 runs sampled)
-@parcel/source-map - small x 225,072 ops/sec ±0.40% (93 runs sampled)
+concat-source-maps - small with lineCount x 3,527,239 ops/sec ±0.30% (92 runs sampled)
+concat-source-maps - small x 1,385,932 ops/sec ±0.36% (93 runs sampled)
+@parcel/source-map - small x 222,989 ops/sec ±0.39% (95 runs sampled)
 
-concat-source-maps - medium with lineCount x 2,019,728 ops/sec ±0.41% (94 runs sampled)
-concat-source-maps - medium x 1,797 ops/sec ±0.43% (97 runs sampled)
-@parcel/source-map - medium x 699 ops/sec ±0.53% (97 runs sampled)
+concat-source-maps - medium with lineCount x 2,071,118 ops/sec ±0.40% (94 runs sampled)
+concat-source-maps - medium x 2,853 ops/sec ±0.30% (101 runs sampled)
+@parcel/source-map - medium x 690 ops/sec ±0.66% (96 runs sampled)
 
-concat-source-maps - large with lineCount x 1,623,085 ops/sec ±0.34% (95 runs sampled)
-concat-source-maps - large x 12.57 ops/sec ±0.66% (37 runs sampled)
-@parcel/source-map - large x 6.96 ops/sec ±4.03% (22 runs sampled)
+concat-source-maps - large with lineCount x 1,657,165 ops/sec ±0.36% (100 runs sampled)
+concat-source-maps - large x 28.66 ops/sec ±0.27% (52 runs sampled)
+@parcel/source-map - large x 6.89 ops/sec ±3.88% (22 runs sampled)
 ```
 
 Concatenating source maps for 3 small files:
