@@ -27,7 +27,7 @@ class SourceMap {
       this.mappings += ';'.repeat(line - this.lastLine);
     }
 
-    lineCount = lineCount || countLines(content);
+    lineCount = lineCount || (countLines(content) + 1);
     let firstMapping = vlq.encode([
       0,
       this.sources.length - this.lastSource,
@@ -215,6 +215,7 @@ function analyzeMappings(mappings, hasNames) {
 
 module.exports.analyzeMappings = analyzeMappings;
 
+// The first line counts as 0
 function countLines(code) {
   let lastIndex = code.indexOf('\n');
   let count = 0;

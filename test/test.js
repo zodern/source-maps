@@ -128,12 +128,12 @@ describe('three input maps', () => {
 describe('emptyMap', () => {
   it('should generate empty map', () => {
     let sm = new SourceMap();
-    sm.addEmptyMap('test.js', '\n\n\n\n\n', 5);
+    sm.addEmptyMap('test.js', '\n\n\n\n', 5);
     const map = sm.build();
     assert.deepStrictEqual(map, {
       mappings: ';;;;;AAAA;AACA;AACA;AACA;AACA;',
       sources: ['test.js'],
-      sourcesContent: ['\n\n\n\n\n'],
+      sourcesContent: ['\n\n\n\n'],
       names: [],
       version: 3
     });
@@ -143,17 +143,18 @@ describe('emptyMap', () => {
     let input = 'AAAA,MAMAA,CAACC,MAAM;';
     let sm = new SourceMap();
     sm.addMap({ mappings: input, sources: ['a', 'b'], sourcesContent: ['a', 'b'], names: ['a', 'b'] });
-    sm.addEmptyMap('test.js', '\n\n\n', 2);
+    sm.addEmptyMap('test.js', '\n\n', 2);
     const { mappings } = sm.build();
 
     assert.equal(mappings, 'AAAA,MAMAA,CAACC,MAAM;;AENP;AACA;AACA;')
   });
+
   it('should update last values', () => {
     let input = 'AAAA,MAMAA,CAACC,MAAM;';
     let sm = new SourceMap();
     sm.addMap({ mappings: input, sources: ['a', 'b'], sourcesContent: ['a', 'b'], names: ['a', 'b'] });
-    sm.addEmptyMap('test.js', '\n\n\n', 2);
-    sm.addEmptyMap('test.js', '\n\n\n', 6);
+    sm.addEmptyMap('test.js', '1\n2\n3', 2);
+    sm.addEmptyMap('test.js', '1\n2\n3', 6);
     const { mappings } = sm.build();
 
     assert.equal(mappings, 'AAAA,MAMAA,CAACC,MAAM;;AENP;AACA;AACA;;ACFA;AACA;AACA;')
