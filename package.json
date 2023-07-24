@@ -1,6 +1,6 @@
 {
   "name": "@zodern/source-maps",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Concat source maps; very fast and in pure js",
   "main": "index.js",
   "scripts": {
