@@ -1,14 +1,17 @@
 {
-  "name": "source-maps",
+  "name": "concat-source-maps",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "zodern",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zodern/concat-source-maps.git"
+  },
   "devDependencies": {
     "benchmark": "^2.1.4",
     "mocha": "^10.2.0"
