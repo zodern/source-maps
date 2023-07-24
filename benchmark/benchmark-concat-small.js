@@ -16,7 +16,7 @@ new Benchmark.Suite()
     map.addVLQMap(smallMap, smallLineCount * 3 + 3);
     map.toVLQ();
   })
-  .add('concat-source-maps', function () {
+  .add('@zodern/source-maps', function () {
     let map = new ConcatSourceMap();
     map.addMap(smallMap, smallLineCount * 1 + 1);
     map.addMap(smallMap, smallLineCount * 2 + 2);

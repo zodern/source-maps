@@ -1,13 +1,13 @@
-# concat-source-maps
+# @zodern/source-maps
 
 Very fast library to concat source maps. Generally at least 3x faster than other source map libraries.
 
 ```
-npm install concat-source-maps
+npm install @zodern/source-maps
 ```
 
 ```js
-const SourceMap = require('concat-source-maps');
+const SourceMap = require('@zodern/source-maps');
 const fs = require('node:fs');
 
 const map = new SourceMap();
@@ -31,30 +31,30 @@ This design would lend itself to easily adding caching, or parallelism using wor
 Generating empty source maps (small is 10 line files, medium is 10,000 line files, and large is 1,000,000 line files).
 Larger is better.
 ```
-concat-source-maps - small with lineCount x 3,527,239 ops/sec ±0.30% (92 runs sampled)
-concat-source-maps - small x 1,385,932 ops/sec ±0.36% (93 runs sampled)
+@zodern/source-maps - small with lineCount x 3,527,239 ops/sec ±0.30% (92 runs sampled)
+@zodern/source-maps - small x 1,385,932 ops/sec ±0.36% (93 runs sampled)
 @parcel/source-map - small x 222,989 ops/sec ±0.39% (95 runs sampled)
 
-concat-source-maps - medium with lineCount x 2,071,118 ops/sec ±0.40% (94 runs sampled)
-concat-source-maps - medium x 2,853 ops/sec ±0.30% (101 runs sampled)
+@zodern/source-maps - medium with lineCount x 2,071,118 ops/sec ±0.40% (94 runs sampled)
+@zodern/source-maps - medium x 2,853 ops/sec ±0.30% (101 runs sampled)
 @parcel/source-map - medium x 690 ops/sec ±0.66% (96 runs sampled)
 
-concat-source-maps - large with lineCount x 1,657,165 ops/sec ±0.36% (100 runs sampled)
-concat-source-maps - large x 28.66 ops/sec ±0.27% (52 runs sampled)
+@zodern/source-maps - large with lineCount x 1,657,165 ops/sec ±0.36% (100 runs sampled)
+@zodern/source-maps - large x 28.66 ops/sec ±0.27% (52 runs sampled)
 @parcel/source-map - large x 6.89 ops/sec ±3.88% (22 runs sampled)
 ```
 
 Concatenating source maps for 3 small files:
 
 ```
-concat-source-maps x 12,740 ops/sec ±0.37% (96 runs sampled)
+@zodern/source-maps x 12,740 ops/sec ±0.37% (96 runs sampled)
 @parcel/source-map x 2,793 ops/sec ±0.36% (97 runs sampled)
 source-map x 2,284 ops/sec ±0.73% (89 runs sampled)
 ```
 
 Concatenating source maps for 3 copies of three.js:
 ```
-concat-source-maps x 258 ops/sec ±0.32% (88 runs sampled)
+@zodern/source-maps x 258 ops/sec ±0.32% (88 runs sampled)
 @parcel/source-map x 23.76 ops/sec ±0.45% (44 runs sampled)
 source-map x 14.12 ops/sec ±3.76% (70 runs sampled)
 ```
@@ -74,7 +74,7 @@ source-map x 14.12 ops/sec ±3.76% (70 runs sampled)
 Constructor has no parameters.
 
 ```js
-const SourceMap = require('concat-source-maps');
+const SourceMap = require('@zodern/source-maps');
 const map = new SourceMap();
 ```
 

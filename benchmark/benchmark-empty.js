@@ -84,42 +84,42 @@ new Benchmark.Suite()
     map.addEmptyMap('test3', inputLarge, largeLineCount * 2 + 2);
     map.toVLQ();
   })
-  .add('concat-source-maps - small', function () {
+  .add('@zodern/source-maps - small', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputSmall, 0);
     map.addEmptyMap('test2', inputSmall, smallLineCount * 1 + 1);
     map.addEmptyMap('test3', inputSmall, smallLineCount * 2 + 2);
     map.build();
   })
-  .add('concat-source-maps - medium', function () {
+  .add('@zodern/source-maps - medium', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputMedium, 0);
     map.addEmptyMap('test2', inputMedium, medLineCount * 1 + 1);
     map.addEmptyMap('test3', inputMedium, medLineCount * 2 + 2);
     map.build();
   })
-  .add('concat-source-maps - large', function () {
+  .add('@zodern/source-maps - large', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputLarge, 0);
     map.addEmptyMap('test2', inputLarge, largeLineCount * 1 + 1);
     map.addEmptyMap('test3', inputLarge, largeLineCount * 2 + 2);
     map.build();
   })
-  .add('concat-source-maps - small with lineCount', function () {
+  .add('@zodern/source-maps - small with lineCount', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputSmall, 0, smallLineCount);
     map.addEmptyMap('test2', inputSmall, smallLineCount * 1 + 1, smallLineCount);
     map.addEmptyMap('test3', inputSmall, smallLineCount * 2 + 2, smallLineCount);
     map.build();
   })
-  .add('concat-source-maps - medium with lineCount', function () {
+  .add('@zodern/source-maps - medium with lineCount', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputMedium, 0, medLineCount);
     map.addEmptyMap('test2', inputMedium, medLineCount * 1 + 1, medLineCount);
     map.addEmptyMap('test3', inputMedium, medLineCount * 2 + 2, medLineCount);
     map.build();
   })
-  .add('concat-source-maps - large with lineCount', function () {
+  .add('@zodern/source-maps - large with lineCount', function () {
     let map = new ConcatSourceMap();
     map.addEmptyMap('test1', inputLarge, 0, largeLineCount);
     map.addEmptyMap('test2', inputLarge, largeLineCount * 1 + 1, largeLineCount);
