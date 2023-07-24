@@ -1,60 +1,5 @@
 const vlq = require('vlq');
 
-function countLines(code) {
-  let lastIndex = code.indexOf('\n');
-  let count = 0;
-
-  while(lastIndex > -1) {
-    count += 1;
-    lastIndex = code.indexOf('\n', lastIndex + 1);
-  }
-
-  return count;
-}
-
-let charIntegers = new Int8Array(300);
-
-'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
-  .split('')
-  .forEach(function (char, i) {
-    charIntegers[char.charCodeAt(0)] = i;
-  });
-
-function decode(string, pos, index, end) {
-  let shift = 0;
-  let value = 0;
-  let posIndex = 0;
-
-  for (let i = index; i < end; i += 1) {
-    let integer = charIntegers[string.charCodeAt(i)];
-
-    const has_continuation_bit = integer & 32;
-
-    integer &= 31;
-    value += integer << shift;
-
-    if (has_continuation_bit) {
-      shift += 5;
-    } else {
-      const should_negate = value & 1;
-      value >>>= 1;
-
-      if (should_negate) {
-        pos[posIndex++] += value === 0 ? -0x80000000 : -value;
-      } else {
-        if (posIndex == 1) {
-        }
-        pos[posIndex++] += value;
-      }
-
-      // reset
-      value = shift = 0;
-    }
-  }
-
-  return posIndex;
-}
-
 module.exports = class SourceMap {
   constructor() {
     this.mappings = '';
@@ -267,3 +212,59 @@ function analyzeMappings(mappings, hasNames) {
 }
 
 module.exports.analyzeMappings = analyzeMappings;
+
+function countLines(code) {
+  let lastIndex = code.indexOf('\n');
+  let count = 0;
+
+  while (lastIndex > -1) {
+    count += 1;
+    lastIndex = code.indexOf('\n', lastIndex + 1);
+  }
+
+  return count;
+}
+
+let charIntegers = new Int8Array(300);
+
+'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+  .split('')
+  .forEach(function (char, i) {
+    charIntegers[char.charCodeAt(0)] = i;
+  });
+
+function decode(string, pos, index, end) {
+  let shift = 0;
+  let value = 0;
+  let posIndex = 0;
+
+  for (let i = index; i < end; i += 1) {
+    let integer = charIntegers[string.charCodeAt(i)];
+
+    const has_continuation_bit = integer & 32;
+
+    integer &= 31;
+    value += integer << shift;
+
+    if (has_continuation_bit) {
+      shift += 5;
+    } else {
+      const should_negate = value & 1;
+      value >>>= 1;
+
+      if (should_negate) {
+        pos[posIndex++] += value === 0 ? -0x80000000 : -value;
+      } else {
+        if (posIndex == 1) {
+        }
+        pos[posIndex++] += value;
+      }
+
+      // reset
+      value = shift = 0;
+    }
+  }
+
+  return posIndex;
+}
+
