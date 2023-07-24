@@ -4,7 +4,8 @@ const ConcatSourceMap = require('../');
 const fs = require('node:fs');
 const sourcemap = require('source-map');
 
-const smallLineCount = fs.readFileSync('./small.js', 'utf-8').split('\n').length;
+const smallCode = fs.readFileSync('./small.js', 'utf-8');
+const smallLineCount = smallCode.split('\n').length + 1;
 const smallMap = JSON.parse(fs.readFileSync('./small.js.map', 'utf-8'));
 
 new Benchmark.Suite()
@@ -22,6 +23,13 @@ new Benchmark.Suite()
     map.addMap(smallMap, smallLineCount * 2 + 2);
     map.addMap(smallMap, smallLineCount * 3 + 3);
     map.build();
+  })
+  .add('@zodern/source-maps CombinedFile', function () {
+    let file = new ConcatSourceMap.CombinedFile();
+    file.addCodeWithMap('/small.js', { code: smallCode, map: smallMap });
+    file.addCodeWithMap('/small.js', { code: smallCode, map: smallMap });
+    file.addCodeWithMap('/small.js', { code: smallCode, map: smallMap });
+    file.build();
   })
   .add('source-map', {
     defer: true,

@@ -4,7 +4,8 @@ const ConcatSourceMap = require('../');
 const fs = require('node:fs');
 const sourcemap = require('source-map');
 
-const largeLineCount = fs.readFileSync('./three.js', 'utf-8').split('\n').length;
+const largeCode = fs.readFileSync('./three.js', 'utf-8');
+const largeLineCount = largeCode.split('\n').length + 1;
 const largeMap = JSON.parse(fs.readFileSync('./three.js.map', 'utf-8'));
 
 new Benchmark.Suite()
@@ -22,6 +23,13 @@ new Benchmark.Suite()
     map.addMap(largeMap, largeLineCount * 2 + 2);
     map.addMap(largeMap, largeLineCount * 3 + 3);
     map.build();
+  })
+  .add('@zodern/source-maps CombinedFile', function () {
+    let file = new ConcatSourceMap.CombinedFile();
+    file.addCodeWithMap('/three.js', { code: largeCode, map: largeMap });
+    file.addCodeWithMap('/three.js', { code: largeCode, map: largeMap });
+    file.addCodeWithMap('/three.js', { code: largeCode, map: largeMap });
+    file.build();
   })
   .add('source-map', {
     defer: true,
@@ -60,4 +68,4 @@ new Benchmark.Suite()
   .on('complete', function () {
     console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
-  .run({ async: true })
+  .run({ async: false })

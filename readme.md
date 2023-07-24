@@ -26,7 +26,7 @@ The mapping parser has also been heavily optimized, and is 2x - 4x faster than m
 
 This design would lend itself to easily adding caching, or parallelism using workers. Currently neither has been implemented.
 
-#### benchmark
+#### Benchmark
 
 Generating empty source maps: 
 
@@ -50,19 +50,21 @@ Generating empty source maps:
 Concatenating source maps for 3 small files:
 
 ```
-@zodern/source-maps x 12,740 ops/sec ±0.37% (96 runs sampled)
-@parcel/source-map x 2,793 ops/sec ±0.36% (97 runs sampled)
-source-map x 2,284 ops/sec ±0.73% (89 runs sampled)
+@zodern/source-maps x 12,191 ops/sec ±0.17% (99 runs sampled)
+@zodern/source-maps CombinedFile x 10,400 ops/sec ±0.21% (100 runs sampled)
+@parcel/source-map x 2,829 ops/sec ±0.34% (99 runs sampled)
+source-map x 2,359 ops/sec ±0.25% (90 runs sampled)
 ```
 
 Concatenating source maps for 3 copies of three.js:
 ```
-@zodern/source-maps x 258 ops/sec ±0.32% (88 runs sampled)
-@parcel/source-map x 23.76 ops/sec ±0.45% (44 runs sampled)
-source-map x 14.12 ops/sec ±3.76% (70 runs sampled)
+@zodern/source-maps x 243 ops/sec ±0.36% (90 runs sampled)
+@zodern/source-maps CombinedFile x 129 ops/sec ±1.48% (84 runs sampled)
+@parcel/source-map x 22.33 ops/sec ±0.56% (41 runs sampled)
+source-map x 14.07 ops/sec ±3.36% (70 runs sampled)
 ```
 
-### Downsides?
+### Downsides
 
 - The names array and other parts of the source map are not deduplicated, which could result in a larger source map. However, sometimes the mappings are smaller which helps to counteract that.
 - input index maps are currently not supported, though it wouldn't be difficult to add.
@@ -109,3 +111,44 @@ map.build();
 ```
 
 Returns the output source map.
+
+#### class CombinedFile
+
+Handles concatenating both the source maps and code.
+
+```js
+const { CombinedFile } = require('@zodern/source-maps');
+
+const file = new CombinedFile(); 
+```
+
+#### file.addGeneratedCode
+
+```js
+file.addGeneratedCode(code);
+file.addGeneratedCode('// File created on\n');
+```
+
+Adds code to the file, without generating a source map for it.
+
+#### file.addCodeWithMap
+
+```js
+// map, header, and footer are all optional
+file.addCodeWithMap(sourceName, { code, map, header, footer });
+file.addCodeWithMap(sourceName, { code });
+file.addCodeWithMap(sourceName, { code, header });
+file.addCodeWithMap('/explore.js', { code: 'console.log("explore.js");', header: '//\n// explore.js\n//\n' });
+```
+
+Adds an input file to be concatenated. Both the sourceName (file's path), and code is required. If there is no source map, one will be generated. The header and footer, if provided, are added as generated code.
+
+Any previously added code must end on a new line - the source maps are added/generated expecting the code to start at the beginning of a line.
+
+#### file.build
+
+```
+file.build();
+```
+
+Returns an object with `{ code, map }`.

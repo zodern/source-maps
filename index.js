@@ -278,11 +278,6 @@ class CombinedFile {
     this._addedFiles = 0;
   }
 
-  addEmptyLines(lineCount) {
-    this._chunks.push('\n'.repeat(lineCount));
-    this._lineOffset += lineCount;
-  }
-
   addGeneratedCode(code) {
     let lineCount = countLines(code);
     this._chunks.push(code);
@@ -401,7 +396,7 @@ class CombinedFile {
 
     if (this._addedFiles < 2) {
       ({ code, map } = this._buildWithBiasedMap());
-    } else if (!this._hasInputMaps) {
+    } else {
       ({ code, map } = this._buildWithMap());
     }
 
