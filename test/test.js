@@ -94,6 +94,23 @@ describe('two input maps', () => {
       version: 3
     });
   });
+
+  it('should handle maps without sourcesContent', () => {
+    let inputMappings = 'AAAA;ACAA;';
+    let input = { mappings: inputMappings, sources: ['a'] };
+    let sm = new SourceMap();
+    sm.addMap(input);
+    sm.addMap({ mappings: inputMappings, sources: ['b'], sourcesContent: ['// b'] }, 3);
+    sm.addMap(input);
+    const map = sm.build();
+    assert.deepStrictEqual(map, {
+      mappings: 'AAAA;ACAA;;AAAA;ACAA;AAAA;ACAA;',
+      names: [],
+      sources: ['a', 'b', 'a'],
+      sourcesContent: [null, '// b'],
+      version: 3
+    });
+  });
 });
 
 describe('three input maps', () => {
@@ -232,11 +249,57 @@ describe('CombinedFile', () => {
       code: 'test\n// test.js\n\nvar i = 0;\ni++\n;// end\nalert("message");',
       map: {
         names: [],
-        mappings: ';;;AAAA;AACA;AACA;;ACFA;',
+        mappings: ';;;AAAA;AACA;AACA;ACFA;',
         sources: ['/test.js', '/test2.js'],
         sourcesContent: ['var i = 0;\ni++\n;', 'alert("message");'],
         version: 3
       }
     });
+  });
+
+  it('should handle empty mappings', () => {
+    const file = new SourceMap.CombinedFile();
+
+    file.addCodeWithMap('/1.js', { code: 'very long text 1', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "" } });
+    file.addGeneratedCode('\n\n');
+    file.addCodeWithMap('/2.js', { code: 'very long text 2', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+
+    let out = file.build();
+    assert.deepStrictEqual(out, {
+      code: 'very long text 1\n\nvery long text 2',
+      map: {
+        names: [],
+        mappings: ';;AAAA',
+        sources: ['<anon>'],
+        sourcesContent: [],
+        version: 3
+      }
+    })
+  });
+
+  it('should put mappings on right lines', () => {
+    const file = new SourceMap.CombinedFile();
+
+    file.addCodeWithMap('/1.js', { code: 'very long text 1', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+    file.addGeneratedCode('\n\n');
+    file.addCodeWithMap('/2.js', { code: 'very long text 2', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+    file.addGeneratedCode('\n\n');
+    file.addCodeWithMap('/3.js', { code: 'very long text 3', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+    file.addGeneratedCode('\n\n');
+    file.addCodeWithMap('/4.js', { code: 'very long text 4', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+    file.addGeneratedCode('\n\n');
+    file.addCodeWithMap('/5.js', { code: 'very long text 5', map: { "version": 3, "sources": ["<anon>"], "names": [], "mappings": "AAAA" } });
+
+    let out = file.build();
+    assert.deepStrictEqual(out, {
+      code: 'very long text 1\n\nvery long text 2\n\nvery long text 3\n\nvery long text 4\n\nvery long text 5',
+      map: {
+        names: [],
+        mappings: 'AAAA;;ACAA;;ACAA;;ACAA;;ACAA',
+        sources: ['<anon>', '<anon>', '<anon>', '<anon>', '<anon>'],
+        sourcesContent: [],
+        version: 3
+      }
+    })
   });
 });

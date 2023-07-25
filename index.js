@@ -27,7 +27,7 @@ class SourceMap {
       this.mappings += ';'.repeat(line - this.lastLine);
     }
 
-    lineCount = lineCount || (countLines(content) + 1);
+    lineCount = lineCount || (countNewLines(content) + 1);
     let firstMapping = vlq.encode([
       0,
       this.sources.length - this.lastSource,
@@ -54,6 +54,10 @@ class SourceMap {
   }
 
   addMap({ mappings, sources, sourcesContent, names = [] }, line = 0) {
+    if (mappings.length === 0) {
+      return;
+    }
+
     this._endOnNewLine();
 
     let {
@@ -116,21 +120,33 @@ class SourceMap {
     // Caching this here is significantly faster than doing it in _endOnNewLine
     this._endsOnNewLine = modifiedMappings.charAt(modifiedMappings.length - 1) === ';';
 
+    if (this._endsOnNewLine) {
+      lines += 1;
+    }
+
+    if (sourcesContent) {
+      while(this.sourcesContent.length < this.sources.length) {
+        this.sourcesContent.push(null);
+      }
+
+      this.sourcesContent.push(...sourcesContent);
+    }
+
     this.sources.push(...sources);
-    this.sourcesContent.push(...sourcesContent);
     this.names.push(...names);
 
     this.lastSource += lastSource;
     this.lastSourceLine += lastSourceLine;
     this.lastSourceCol += lastSourceCol;
     this.lastName += lastName;
-    this.lastLine = lines + line;
+    this.lastLine = lines + (line - 1);
     this.mappings += modifiedMappings;
   }
 
   _endOnNewLine() {
     if (!this._endsOnNewLine) {
       this.mappings += ';';
+      this.lastLine += 1;
     }
   }
 
@@ -208,15 +224,14 @@ function analyzeMappings(mappings, hasNames) {
     lastSourceLine: pos[2],
     lastSourceCol: pos[3],
     lastName: pos[4],
-    lines,
+    lines: Math.max(1, lines),
     modifications
   };
 }
 
 module.exports.analyzeMappings = analyzeMappings;
 
-// The first line counts as 0
-function countLines(code) {
+function countNewLines(code) {
   let lastIndex = code.indexOf('\n');
   let count = 0;
 
@@ -279,7 +294,7 @@ class CombinedFile {
   }
 
   addGeneratedCode(code) {
-    let lineCount = countLines(code);
+    let lineCount = countNewLines(code);
     this._chunks.push(code);
     this._lineOffset += lineCount;
   }
@@ -291,7 +306,7 @@ class CombinedFile {
     footer
   }) {
     this._addedFiles += 1;
-    let lineCount = countLines(code) + 1;
+    let newLines = countNewLines(code);
     
     if (header) {
       this.addGeneratedCode(header);
@@ -302,18 +317,14 @@ class CombinedFile {
       map,
       sourceName,
       lineOffset: this._lineOffset,
-      lines: lineCount
+      lines: newLines + 1
     });
 
     if (footer) {
       this.addGeneratedCode(footer);
     }
 
-    if (map) {
-      this._hasInputMaps = true;
-    }
-
-    this._lineOffset += lineCount;
+    this._lineOffset += newLines;
   }
 
   _buildWithMap() {
