@@ -1,5 +1,10 @@
 const vlq = require('vlq');
 
+// Spreading a large array into push() overflows the call-stack argument limit.
+function pushAll(target, items) {
+  for (let i = 0; i < items.length; i++) target.push(items[i]);
+}
+
 class SourceMap {
   constructor() {
     this.mappings = '';
@@ -129,11 +134,11 @@ class SourceMap {
         this.sourcesContent.push(null);
       }
 
-      this.sourcesContent.push(...sourcesContent);
+      pushAll(this.sourcesContent, sourcesContent);
     }
 
-    this.sources.push(...sources);
-    this.names.push(...names);
+    pushAll(this.sources, sources);
+    pushAll(this.names, names);
 
     this.lastSource += lastSource;
     this.lastSourceLine += lastSourceLine;
