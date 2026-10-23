@@ -303,3 +303,30 @@ describe('CombinedFile', () => {
     })
   });
 });
+
+describe('large input arrays', () => {
+  // Appending via push(...arr) overflows the argument limit once the arrays get
+  // big (e.g. a ~68MB bundle has ~1.3M names). These must append without throwing.
+  it('appends large sources, sourcesContent and names without overflowing', () => {
+    const N = 300000;
+    const sources = [];
+    const sourcesContent = [];
+    const names = [];
+    for (let i = 0; i < N; i++) {
+      sources.push('s' + i + '.js');
+      sourcesContent.push('content ' + i);
+      names.push('name' + i);
+    }
+
+    const sm = new SourceMap();
+    assert.doesNotThrow(() => {
+      sm.addMap({ mappings: 'AAAA', sources, sourcesContent, names });
+      sm.build();
+    });
+    const map = sm.build();
+    assert.equal(map.sources.length, N);
+    assert.equal(map.sourcesContent.length, N);
+    assert.equal(map.names.length, N);
+    assert.equal(map.sources[N - 1], 's' + (N - 1) + '.js');
+  });
+});
