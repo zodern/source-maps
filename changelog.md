@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.1.2, Oct 23, 2026
+
+- Fix call-stack overflow for large names arrays (@miamagana)
+
 ### v1.1.1, July 25, 2023
 
 - Fix issues with line numbers
